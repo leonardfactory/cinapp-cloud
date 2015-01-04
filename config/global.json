@@ -1,0 +1,11 @@
+{
+    "applications": {
+        "_default": {
+            "link": "<your app name>"
+        }, 
+        "cinapp": {
+            "applicationId": "<your app id>", 
+            "masterKey": "<your master key>"
+        }
+    }
+}
