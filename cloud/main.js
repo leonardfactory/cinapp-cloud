@@ -36,3 +36,31 @@ Parse.Cloud.define("insertMovie", function(request, response)
             }
         });
 });
+
+/**
+ * Remove movie from watchlist
+ */
+Parse.Cloud.define("removeWatchedMovie", function (request, response) 
+{
+    var user = request.user;
+    var movieFindQuery = new Parse.Query(Movie);
+    movieFindQuery.equalTo('imdbId', request.params.movie.imdbId);
+    movieFindQuery.first()
+        .then(function (movie) 
+        {
+            if(!movie) {
+                response.error('Movie not found');
+            }
+            else {
+                user.relation('watched').remove(movie)
+                    .then(function () {
+                        response.success(movie);
+                    }, 
+                    function (error) {
+                        response.error(error);
+                    });
+            }
+        });
+    
+    user.relation('watched').remove()
+});
