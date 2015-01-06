@@ -46,13 +46,14 @@ Parse.Cloud.define("removeWatchedMovie", function (request, response)
     var movieFindQuery = new Parse.Query(Movie);
     movieFindQuery.equalTo('imdbId', request.params.movie.imdbId);
     movieFindQuery.first()
-        .then(function (movie) 
+        .then(function (movie)
         {
             if(!movie) {
                 response.error('Movie not found');
             }
             else {
-                user.relation('watched').remove(movie)
+                user.relation('watched').remove(movie);
+                user.save()
                     .then(function () {
                         response.success(movie);
                     }, 
@@ -61,6 +62,4 @@ Parse.Cloud.define("removeWatchedMovie", function (request, response)
                     });
             }
         });
-    
-    user.relation('watched').remove()
 });
