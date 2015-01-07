@@ -1,6 +1,8 @@
 var ParseCustom = require('cloud/common/ParseCustom.js');
 ParseCustom.init();
 
+var _ = require('underscore');
+
 var Movie = require('cloud/models/Movie.js');
 
 /**
@@ -53,6 +55,7 @@ Parse.Cloud.define("removeWatchedMovie", function (request, response)
             }
             else {
                 user.relation('watched').remove(movie);
+                user.remove('watchedId', movie.imdbId);
                 user.save()
                     .then(function () {
                         response.success(movie);
