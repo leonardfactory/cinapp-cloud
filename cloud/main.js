@@ -3,7 +3,8 @@ ParseCustom.init();
 
 var _ = require('underscore');
 
-var Movie = require('cloud/models/Movie.js');
+var Movie       = require('cloud/models/Movie.js');
+var Watchlist   = require('cloud/models/Watchlist.js');
 
 /**
  * Add a new movie if it doesn't exist in Database.
@@ -36,7 +37,7 @@ Parse.Cloud.define("insertMovie", function(request, response)
                     }
                 });
             }
-        });
+        }, response.error);
 });
 
 /**
@@ -64,5 +65,43 @@ Parse.Cloud.define("removeWatchedMovie", function (request, response)
                         response.error(error);
                     });
             }
-        });
+        }, response.error);
+});
+
+/**
+ * Avoid watchlists with same name
+ */
+Parse.Cloud.beforeSave("Watchlist", function (request, response) 
+{
+    if(!request.object.existed()) {
+        /**
+         * Assign normalizedName and search for watchlists with the same name
+         */
+        request.object.normalizedName = request.object.computedNormalizedName(request.user);
+        
+        var nameQuery = new Parse.Query(Watchlist);
+        nameQuery.equalTo('normalizedName', request.object.normalizedName);
+        nameQuery.first()
+            .then(function (object) {
+                if(object) {
+                    response.error('Watchlist normalizedName should be unique');
+                }
+                else {
+                    response.success();
+                }
+            }, response.error);
+    }
+    else {
+        /**
+         * be sure that normalizedName has not been modified
+         */
+        for(var key in request.object.dirtyKeys()) {
+            if(key === 'normalizedName') {
+                response.error('normalizedName cannot be modified');
+                return;
+            }
+        }
+        
+        response.success();
+    }
 });
