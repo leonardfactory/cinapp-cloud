@@ -42,8 +42,16 @@ ParseCustom.init = function ()
             {
                 var _this = this;
                 _.each(prototypeProps.attrs, function (attr) {
-                    if(typeof obj[attr] !== "undefined") {
-                        _this.set(attr, obj[attr]);
+                    // Process only defined attributes
+                    if(typeof obj[attr] !== "undefined") 
+                    {
+                        // Date
+                        if( (typeof obj[attr].__type !== "undefined") && obj[attr].__type === "Date" ) {
+                            _this.set(attr, new Date(obj[attr].iso));
+                        }
+                        else {
+                            _this.set(attr, obj[attr]);
+                        }
                     }
                 });
             }

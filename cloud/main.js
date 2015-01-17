@@ -9,10 +9,10 @@ var Watchlist   = require('cloud/models/Watchlist.js');
 /**
  * Add a new movie if it doesn't exist in Database.
  */
-Parse.Cloud.define("insertMovie", function(request, response) 
+/*Parse.Cloud.define("insertMovie", function(request, response) 
 {
     var movieExistsQuery = new Parse.Query(Movie);
-    movieExistsQuery.equalTo('imdbId', request.params.movie.imdbId);
+    movieExistsQuery.equalTo('imdbId', request.params.imdbId);
     movieExistsQuery.find()
         .then(function (movies) 
         {
@@ -21,7 +21,7 @@ Parse.Cloud.define("insertMovie", function(request, response)
             }
             else {
                 var movie = new Movie();
-                movie.fromObject(request.params.movie);
+                movie.fromObject(request.params);
     
                 //var acl = new Parse.ACL();
                 //acl.setPublicReadAccess(true);
@@ -38,7 +38,7 @@ Parse.Cloud.define("insertMovie", function(request, response)
                 });
             }
         }, response.error);
-});
+});*/
 
 /**
  * Remove movie from watchlist
@@ -59,13 +59,29 @@ Parse.Cloud.define("removeWatchedMovie", function (request, response)
                 user.remove('watchedId', movie.imdbId);
                 user.save()
                     .then(function () {
-                        response.success(movie);
+                        response.success(user);
                     }, 
                     function (error) {
                         response.error(error);
                     });
             }
         }, response.error);
+});
+
+Parse.Cloud.beforeSave("Movie", function (request, response) 
+{
+    if(!request.object.existed()) {
+        /**
+         * No one should edit a movie directly.
+         */
+        var movieACL = new Parse.ACL();
+        movieACL.setPublicReadAccess(true);
+        movieACL.setPublicWriteAccess(false);
+        
+        request.object.setACL(movieACL);
+        
+        response.success();
+    }
 });
 
 /**
