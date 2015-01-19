@@ -1,21 +1,133 @@
-
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>My ParseApp site</title>
-    <style>
-    body { font-family: Helvetica, Arial, sans-serif; }
-    div { width: 800px; height: 400px; margin: 40px auto; padding: 20px; border: 2px solid #5298fc; }
-    h1 { font-size: 30px; margin: 0; }
-    p { margin: 40px 0; }
-    em { font-family: monospace; }
-    a { color: #5298fc; text-decoration: none; }
-    </style>
-  </head>
-  <body>
-    <div>
-      <h1>Congratulations! You're already hosting with Parse.</h1>
-      <p>To get started, edit this file at <em>public/index.html</em> and start adding static content.</p>
-      <p>If you want something a bit more dynamic, delete this file and check out <a href="https://parse.com/docs/hosting_guide#webapp">our hosting docs</a>.</p>
-    </div>
-  </body>
+    <head>
+        <title>Cinapp</title>
+
+        <!-- social media tags -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@leonardfactory">
+        <meta name="twitter:title" content="Cinapp">
+        <meta name="twitter:description" content="A platform to make movie choice easier.">
+        <meta name="twitter:creator" content="@leonardfactory">
+        <!-- <meta name="twitter:image:src" content=""> -->
+        <meta property="og:title" content="Cinapp" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://cinapp.com" />
+        <!-- <meta property="og:image" content="" /> -->
+        <meta property="og:description" content="A platform to make movie choice easier.">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+        
+        <!-- bower:css -->
+        <link rel="stylesheet" href="libs/animate-css/animate.min.css">
+        <!-- endinject -->
+        <!-- assets:css -->
+        <link rel="stylesheet" href="assets/css/00-normalize.css">
+        <link rel="stylesheet" href="assets/css/01-skeleton.css">
+        <link rel="stylesheet" href="assets/css/02-open-iconic.min.css">
+        <link rel="stylesheet" href="assets/css/main.css">
+        <!-- endinject -->
+        <!-- app:css -->
+        <!-- endinject -->
+    </head>
+    <body>
+        <nav class="navbar u-full-width" role="navigation">
+            <div class="u-pull-right" ng-controller="LoginController as loginCtrl" ng-cloak>
+                <ul class="navbar-menu" ng-if="loginCtrl.logged === false" lf-shake-error="loginCtrl.error">
+                    <li ui-sref-active="active"><a ui-sref="main">Home</a></li>
+                    <li>
+                        <form class="navbar-form form-inline" role="login"> <!-- -->
+                            <input type="text" class="form-control form-control-negative" placeholder="Username" ng-model="loginCtrl.user.username">
+                            <input type="password" class="form-control form-control-negative" placeholder="Password" ng-model="loginCtrl.user.password">
+                            <button type="submit" class="btn btn-primary" ng-click="loginCtrl.login()">Login</button>
+                        </form>
+                    </li>
+                </ul>
+                <ul class="navbar-menu" ng-if="loginCtrl.logged === true">
+                    <li ui-sref-active="active"><a ui-sref="main">Home</a></li>
+                    <li ui-sref-active="active"><a ui-sref="movies">My Movies</a></li>
+                    <li ui-sref-active="active"><a ui-sref="watchlist">Watchlists</a></li>
+                    <li ui-sref-active="active"><a ui-sref="search">Search</a></li>
+                    <li ui-sref-active="active"><a ui-sref="add">Add</a></li>
+                    <li><a class="logout" ng-click="loginCtrl.logout()">Logout</a></li>
+                </ul>
+            </div>
+            <a class="nav-brand" href="#">
+                <img src="assets/images/nav-logo-negative.png" />
+            </a>
+            
+            <!-- Loader -->
+            <div class="spinner-container" ng-cloak ng-controller="LoaderController as loaderCtrl">
+                <div class="spinner" ng-if="loaderCtrl.loading">
+                    <div class="loader">Loading</div>
+                </div>
+            </div>
+        </nav>
+        <!--<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <img src="assets/images/nav-logo-big.png" />
+                    </a>
+                </div>
+                
+                <div collapse="navCollapsed" class="collapse navbar-collapse" ng-controller="LoginCtrl as loginCtrl">
+                    <form class="navbar-form navbar-right" role="login" ng-if="loginCtrl.logged === false">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Username" ng-model="loginCtrl.user.username">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Password" ng-model="loginCtrl.user.password">
+                        </div>
+                        <button type="submit" class="btn btn-default" ng-click="loginCtrl.login()">Login</button>
+                    </form>
+                    <ul ng-if="loginCtrl.logged === true" class="nav navbar-nav navbar-right">
+                        <li ui-sref-active="active"><a ui-sref="main">Home <span class="sr-only">(current)</span></a></li>
+                        <li ui-sref-active="active"><a ui-sref="movies">My Movies</a></li>
+                        <li ui-sref-active="active"><a ui-sref="search">Search</a></li>
+                        <li ui-sref-active="active"><a ui-sref="add">Add</a></li>
+                    </ul>
+                    <ul ng-if="loginCtrl.logged === false" class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="#/">Home <span class="sr-only">(current)</span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>-->
+        
+        <div ui-view></div>
+        <!-- bower:js -->
+        <script src="libs/angular/angular.min.js"></script>
+        <script src="libs/angular-animate/angular-animate.min.js"></script>
+        <script src="libs/angular-deferred-bootstrap/angular-deferred-bootstrap.min.js"></script>
+        <script src="libs/angular-route/angular-route.min.js"></script>
+        <script src="libs/underscore/underscore-min.js"></script>
+        <script src="libs/angular-locker/dist/angular-locker.min.js"></script>
+        <script src="libs/angular-truncate/src/truncate.js"></script>
+        <script src="libs/angular-ui-router/release/angular-ui-router.min.js"></script>
+        <script src="libs/moment/min/moment.min.js"></script>
+        <script src="libs/ng-parse/dist/ng-parse.min.js"></script>
+        <!-- endinject -->
+        <!-- assets:js -->
+        <script src="assets/libs/themoviedb.min.js"></script>
+        <!-- endinject -->
+        <!-- shared:js -->
+        <script src="shared/shared.js"></script>
+        <script src="shared/templates.js"></script>
+        <!-- endinject -->
+        <!-- app:js -->
+        <script src="app/app.js"></script>
+        <script src="app/templates.js"></script>
+        <!-- endinject -->
+        <!-- inject:js -->
+        <!-- endinject -->
+    </body>
 </html>
